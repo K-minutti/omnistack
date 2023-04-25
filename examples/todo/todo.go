@@ -42,6 +42,15 @@ func CreateItem(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(result.Value)
 }
 
+func UpdateItem(w http.ResponseWriter, r *http.Request) {}
+func GetItemByID(Id int) bool {return true}
+func GetCompletedItems(w http.ResponseWriter, r *http.Request) {}
+func GetIncompletedItems(w http.ResponseWriter, r *http.Request) {}
+// func GetTodoItems(completed bool) interface{} {}
+func DeleteItem(w http.ResponseWriter, r *http.Request) {}
+
+
+
 
 func main() {
     defer db.Close()
@@ -52,6 +61,11 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/healthz", Healthz).Methods("GET")
     router.HandleFunc("/todo", CreateItem).Methods("POST")
+    router.HandleFunc("/todo/{id}", UpdateItem).Methods("POST")
+    router.HandleFunc("/todo/{id}", DeleteItem).Methods("DELETE")
+    router.HandleFunc("/todo-completed", GetCompletedItems).Methods("GET")
+    router.HandleFunc("/todo-incomplete", GetIncompletedItems).Methods("GET")
+
     log.Info("Staring server on port:8000 ...") 
     http.ListenAndServe(":8000", router)
 }
