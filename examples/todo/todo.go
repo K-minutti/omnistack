@@ -46,9 +46,9 @@ func UpdateItem(w http.ResponseWriter, r *http.Request) {
     err := GetItemByID(id)
     if err == false {
         w.Header().Set("Content-Type", "application/json")
-        io.WriteString(w, `{"updated": false, "error": "Item not found"}`
+        io.WriteString(w, `{"updated": false, "error": "Item not found"}`)
     } else {
-        completed, _ := strconv.ParseBool(r.FormValue("completed")
+        completed, _ := strconv.ParseBool(r.FormValue("completed"))
         log.WithFields(log.Fields{"Id": id, "Completed": completed}).Info("Updating TodoItem")
         todo := &TodoItemModel{}
         db.First(&todo, id)
@@ -65,11 +65,20 @@ func GetItemByID(Id int) bool {
     if result.Error != nil{
         log.Warn("TodoItem not found in database")
         return false
+    }
     return true
 }
 
-func GetCompletedItems(w http.ResponseWriter, r *http.Request) {}
-func GetIncompletedItems(w http.ResponseWriter, r *http.Request) {}
+func GetCompletedItems(w http.ResponseWriter, r *http.Request) {
+    completedTodoItems := GetTodoItems(true)
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(completedTodoItems)
+}
+func GetIncompletedItems(w http.ResponseWriter, r *http.Request) {
+    completedTodoItems := GetTodoItems(false)
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(completedTodoItems)
+}
 
 func GetTodoItems(completed bool) interface{} {
     var todos []TodoItemModel
@@ -79,7 +88,7 @@ func GetTodoItems(completed bool) interface{} {
 
 func DeleteItem(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
-    id, _ strconv.Atoi(vars["id"])
+    id, _ := strconv.Atoi(vars["id"])
 
     err := GetItemByID(id)
     if err == false {
