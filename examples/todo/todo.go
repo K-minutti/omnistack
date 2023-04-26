@@ -86,6 +86,18 @@ func GetTodoItems(completed bool) interface{} {
     return TodoItems
 }
 
+func GetAllTodoItems() interface{} {
+    todoItems := []TodoItemModel{}
+    db.Find(&todoItems)
+    return todoItems
+}
+
+func GetAllItems(w http.ResponseWriter, r *http.Request) {
+    allTodoItems := GetAllItems()
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(allTodoItems)
+} 
+
 func DeleteItem(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     id, _ := strconv.Atoi(vars["id"])
@@ -118,6 +130,7 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/healthz", Healthz).Methods("GET")
     router.HandleFunc("/todo", CreateItem).Methods("POST")
+    router.HandlerFunc("/todo/all", GetAllItems).Methods("GET")
     router.HandleFunc("/todo/{id}", UpdateItem).Methods("POST")
     router.HandleFunc("/todo/{id}", DeleteItem).Methods("DELETE")
     router.HandleFunc("/todo-completed", GetCompletedItems).Methods("GET")
